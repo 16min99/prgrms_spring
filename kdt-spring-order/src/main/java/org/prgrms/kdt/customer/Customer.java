@@ -60,7 +60,7 @@ public class Customer {
         return lastLoginAt;
     }
 
-    public LocalDateTime getCreateAt() {
+    public LocalDateTime getCreatedAt() {
         return createAt;
     }
 }

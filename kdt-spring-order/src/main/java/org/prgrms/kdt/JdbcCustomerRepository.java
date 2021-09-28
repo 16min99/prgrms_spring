@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+//단순 JAVA CRUD
 public class JdbcCustomerRepository {
     private static final Logger logger = LoggerFactory.getLogger(JdbcCustomerRepository.class);
     private final String SELECT_BY_NAME_SQL = "select * from customers WHERE name = ?";

@@ -9,5 +9,4 @@ class KdtApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

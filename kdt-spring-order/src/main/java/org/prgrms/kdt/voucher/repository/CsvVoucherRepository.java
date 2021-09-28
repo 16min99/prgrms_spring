@@ -46,7 +46,7 @@ public class CsvVoucherRepository implements VoucherRepository {
     public void roadCSV() {
         BufferedReader br = null;
         try{
-            br = Files.newBufferedReader(Paths.get("/Users/minkyujeon/Desktop/PJ/programers/spring/w3-SpringBoot_Part_A/kdt-spring-order/repository/voucer.csv"));
+            br = Files.newBufferedReader(Paths.get("/Users/minkyujeon/Desktop/PJ/programers/spring/prgrms_spring/kdt-spring-order/repository/voucher.csv"));
             String line = "";
 
             while((line = br.readLine()) != null){
@@ -74,7 +74,7 @@ public class CsvVoucherRepository implements VoucherRepository {
         BufferedWriter bw = null;
         //System.out.println("혹시여기?");
         try{
-            bw = Files.newBufferedWriter(Paths.get("/Users/minkyujeon/Desktop/PJ/programers/spring/w3-SpringBoot_Part_A/kdt-spring-order/repository/voucer.csv"), Charset.forName("UTF-8"));
+            bw = Files.newBufferedWriter(Paths.get("/Users/minkyujeon/Desktop/PJ/programers/spring/prgrms_spring/kdt-spring-order/repository/voucher.csv"), Charset.forName("UTF-8"));
 
             //System.out.println("여기인것인가");
             for(UUID uuid : storage.keySet()){

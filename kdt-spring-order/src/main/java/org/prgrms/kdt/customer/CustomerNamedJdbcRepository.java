@@ -5,25 +5,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.LocalDateTime;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
-public class CustomerJdbcRepository implements CustomerRepository {
+public class CustomerNamedJdbcRepository implements CustomerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerJdbcRepository.class);
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public CustomerJdbcRepository(JdbcTemplate jdbcTemplate) {
+    public CustomerNamedJdbcRepository(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -38,13 +37,23 @@ public class CustomerJdbcRepository implements CustomerRepository {
         return new Customer(customerId, name, email, lastLoginAt, createAt);
     };
 
+
+    private Map<String, Object> toParamMap(Customer customer){
+        return new HashMap<String, Object>() {{
+            put("customerId", customer.getCustomerId().toString().getBytes());
+            put("name", customer.getName());
+            put("email", customer.getEmail());
+            put("createdAt", Timestamp.valueOf(customer.getCreatedAt()));
+            put("lastLoginAt", customer.getLastLoginAt() != null ? Timestamp.valueOf(customer.getLastLoginAt()) : null);
+        }};
+
+    }
+
     @Override
     public Customer insert(Customer customer) {
-        var insertCount = jdbcTemplate.update("insert into customers(customer_id, name, email, created_at) values(UUID_TO_BIN(?), ?, ?, ?)",
-                customer.getCustomerId().toString().getBytes(),
-                customer.getName(),
-                customer.getEmail(),
-                Timestamp.valueOf(customer.getCreatedAt()));
+        var insertCount = jdbcTemplate.update("insert into customers(customer_id, name, email, created_at) values(UUID_TO_BIN(:customerId), :name, :email, :createdAt)"
+                , toParamMap(customer));
+
         if (insertCount != 1) {
             throw new RuntimeException("Nothing was inserted");
         }
@@ -54,11 +63,8 @@ public class CustomerJdbcRepository implements CustomerRepository {
 
     @Override
     public Customer update(Customer customer) {
-        var updateCount = jdbcTemplate.update("UPDATE customers SET name = ?, email = ?, last_login_at = ? WHERE customer_id = UUID_TO_BIN(?)",
-                customer.getName(),
-                customer.getEmail(),
-                customer.getLastLoginAt(),
-                customer.getCustomerId().toString().getBytes());
+        var updateCount = jdbcTemplate.update("UPDATE customers SET name = :name, email = :email, last_login_at = :lastLoginAt WHERE customer_id = UUID_TO_BIN(:customerId)",
+                toParamMap(customer));
         if (updateCount != 1) {
             throw new RuntimeException("Nothing was updated");
         }
@@ -67,7 +73,7 @@ public class CustomerJdbcRepository implements CustomerRepository {
 
     @Override
     public int count() {
-        return jdbcTemplate.queryForObject("SELECT count(*) FROM customers", Integer.class);
+        return jdbcTemplate.queryForObject("SELECT count(*) FROM customers", Collections.emptyMap(), Integer.class);
     }
 
     @Override
@@ -79,8 +85,10 @@ public class CustomerJdbcRepository implements CustomerRepository {
     public Optional<Customer> findById(UUID customerId) {
         try {
             return Optional.ofNullable(
-                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE customer_id = UUID_TO_BIN(?)",
-                            customerRowMapper, customerId.toString().getBytes()));
+                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE customer_id = UUID_TO_BIN(:customerId)",
+                            Collections.singletonMap("customerId", customerId.toString().getBytes()),
+                            customerRowMapper)
+            );
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -91,8 +99,10 @@ public class CustomerJdbcRepository implements CustomerRepository {
     public Optional<Customer> findByName(String name) {
         try {
             return Optional.ofNullable(
-                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE name = ?",
-                            customerRowMapper, name));
+                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE name = :name",
+                            Collections.singletonMap("name", name),
+                            customerRowMapper)
+            );
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -102,22 +112,18 @@ public class CustomerJdbcRepository implements CustomerRepository {
     public Optional<Customer> findByEmail(String email) {
         try {
             return Optional.ofNullable(
-                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE email = ?",
-                            customerRowMapper, email));
+                    jdbcTemplate.queryForObject("SELECT * FROM customers WHERE email = :email",
+                            Collections.singletonMap("email", email),
+                            customerRowMapper)
+            );
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
-//    public List<Customer> findByCreatedDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-//        return jdbcTemplate.query("SELECT * FROM customers WHERE created_at BETWEEN ? AND ?", customerRowMapper,
-//                Timestamp.valueOf(startDate),
-//                Timestamp.valueOf(endDate));
-//    }
-
     @Override
     public void deleteAll() {
-        jdbcTemplate.update("DELETE FROM customers");
+        jdbcTemplate.update("DELETE FROM customers", Collections.emptyMap());
     }
 
 

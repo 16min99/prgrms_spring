@@ -9,26 +9,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import javax.sql.DataSource;
-
-import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
-import static com.wix.mysql.ScriptResolver.classPathScript;
-import static com.wix.mysql.distribution.Version.v8_0_11;
-import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
-import static com.wix.mysql.config.Charset.UTF8;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.config.Charset.UTF8;
+import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
+import static com.wix.mysql.distribution.Version.v8_0_11;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 @SpringJUnitConfig
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CustomerJdbcRepositoryTest {
+class CustomerNamedJdbcRepositoryTest {
 
     @Configuration
     @ComponentScan(
@@ -54,13 +54,13 @@ class CustomerJdbcRepositoryTest {
         }
 
         @Bean
-        public CustomerJdbcRepository customerRepository(JdbcTemplate jdbcTemplate){
-            return new CustomerJdbcRepository(jdbcTemplate);
+        public NamedParameterJdbcTemplate namedParameterJdbcTemplate(JdbcTemplate jdbcTemplate){
+            return new NamedParameterJdbcTemplate(jdbcTemplate);
         }
     }
 
     @Autowired
-    CustomerJdbcRepository customerJdbcRepository;
+    CustomerNamedJdbcRepository customerJdbcRepository;
 
     @Autowired
     DataSource dataSource;
