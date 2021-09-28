@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test;
+    username: sa
+    password:
+
+# https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
+mybatis:
+  # resultSet을 조작하여 사용하는 것은 번거로웠다. (getString으로 어떤 필드를 가져와라)
+  # mybatis는 type-aliases-package에 정의해 놓은 JAVA 객체(포조 객체)에 resultSet의 결과를 자동으로 맵핑해주게 된다.
+  # 즉 type-aliases-package는 어떤 패키지에 있는 객체에 맵핑할 것인지 정해주는 설정
+  type-aliases-package: kdtspring.mybatis.repository.domain
+  # 기본적인 설정
+  configuration:
+    # table에 필드명을 _로 표시하였으나 이것을 camel-case 형태로 포조객체에 맵핑 시켜주겠다는 설정
+    # first_name -> firstName
+    map-underscore-to-camel-case: true
+    # 한번에 최대 몇개씩 가져올 것인가 (select *)
+    default-fetch-size: 100
+    # rdb와 통신할때 timeout을 내뱉는 시간
+    default-statement-timeout: 30
+  # xml 파일 위치
+  mapper-locations: classpath:mapper/*.xml
