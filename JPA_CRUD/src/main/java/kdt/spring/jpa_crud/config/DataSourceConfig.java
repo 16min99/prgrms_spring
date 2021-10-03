@@ -18,7 +18,7 @@ import java.util.Properties;
 
 
 //앞선 jdbc, Mybatis는 Auto configuration을 이용하였음
-//JAVA configuration을 이용
+//JAVA(Spring) configuration을 이용
 @Configuration
 public class DataSourceConfig {
 
@@ -62,7 +62,6 @@ public class DataSourceConfig {
     public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory){
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
-
         return transactionManager;
     }
 }

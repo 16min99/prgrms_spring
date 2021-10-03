@@ -9,5 +9,4 @@ class JpaCrudApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
