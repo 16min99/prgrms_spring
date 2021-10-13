@@ -6,3 +6,6 @@
 
 ### jdbc
 jdbc, jdbcTemplate 예
+
+### JPA_CRUD
+![image](https://user-images.githubusercontent.com/65473604/136919390-19a01dce-7a0c-4615-b262-fc9cae769e98.png)
