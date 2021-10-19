@@ -1,4 +1,6 @@
 # prgrms_spring
+Spring을 이용하여 웹어플리케이션을 만들고  
+테스트코드를 통해서 spring을 공부하는 저장소 입니다.
 
 ## kdt-spring-order
 스프링으로 구현한 바우처 관리 시스템
